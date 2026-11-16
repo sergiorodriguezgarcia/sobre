@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feliz cumpleaños</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --wine: #4a0f1f;
+    --wine-deep: #22050e;
+    --wine-light: #7a1d33;
+    --gold: #c9a24b;
+    --gold-light: #ecd49a;
+    --paper: #fbf6ea;
+    --paper-dark: #efe2c6;
+    --ink: #3b2a1e;
+    --muted: #7a6553;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(201,162,75,.18), transparent 55%),
+      radial-gradient(ellipse at 50% 30%, var(--wine-light) 0%, var(--wine) 45%, var(--wine-deep) 100%);
+    background-attachment: fixed;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+
+  /* ---------- Fase 1: el sobre ---------- */
+  .intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 34px;
+    margin-top: 70px;
+    text-align: center;
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .intro.hidden { opacity: 0; transform: scale(.94); pointer-events: none; }
+
+  .hint { color: var(--gold-light); font-size: 1.05rem; letter-spacing: .22em; text-transform: uppercase; }
+  .hint span {
+    display: block;
+    font-family: 'Great Vibes', cursive;
+    font-size: 2.8rem;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+
+  .envelope {
+    position: relative;
+    width: min(86vw, 380px);
+    aspect-ratio: 3 / 2;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    perspective: 1000px;
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,.45));
+    animation: float 3.5s ease-in-out infinite;
+  }
+  .envelope:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 10px; border-radius: 8px; }
+  .envelope.open { animation: none; }
+
+  .env-back { position: absolute; inset: 0; background: #e2d1ac; border-radius: 6px; z-index: 1; }
+
+  .env-letter {
+    position: absolute;
+    left: 6%; right: 6%; top: 6%; bottom: 6%;
+    background: var(--paper);
+    border-radius: 3px;
+    z-index: 2;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 9%;
+    font-family: 'Great Vibes', cursive;
+    font-size: 2rem;
+    color: var(--wine);
+    transition: transform .8s cubic-bezier(.2,.8,.2,1) .45s;
+  }
+  .envelope.open .env-letter { transform: translateY(-58%); }
+
+  .env-left, .env-right, .env-bottom { position: absolute; inset: 0; z-index: 3; border-radius: 6px; }
+  .env-left   { background: var(--paper-dark); clip-path: polygon(0 0, 52% 56%, 0 100%); }
+  .env-right  { background: var(--paper-dark); clip-path: polygon(100% 0, 48% 56%, 100% 100%); }
+  .env-bottom { background: #f5ebd4; clip-path: polygon(0 100%, 50% 46%, 100% 100%); }
+
+  .env-flap {
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 60%;
+    background: linear-gradient(#ead9b4, #e0cda3);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top center;
+    z-index: 4;
+    transition: transform .6s ease, z-index 0s linear .3s;
+  }
+  .envelope.open .env-flap { transform: rotateX(180deg); z-index: 1; }
+
+  .seal {
+    position: absolute;
+    left: 50%; top: 60%;
+    width: 58px; height: 58px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #a3243f, #6d0f24 70%);
+    box-shadow: 0 3px 6px rgba(0,0,0,.35), inset 0 0 0 4px rgba(0,0,0,.12);
+    display: grid;
+    place-items: center;
+    z-index: 5;
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .seal svg { width: 26px; height: 26px; fill: var(--gold-light); }
+  .envelope.open .seal { opacity: 0; transform: translate(-50%, -50%) scale(1.4); }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50%      { transform: translateY(-8px) rotate(1deg); }
+  }
+
+  /* ---------- Fase 2: la tarjeta ---------- */
+  .card {
+    display: none;
+    position: relative;
+    width: min(100%, 580px);
+    padding: clamp(40px, 7vw, 60px) clamp(22px, 6vw, 52px) clamp(32px, 6vw, 46px);
+    background:
+      radial-gradient(circle at 15% 10%, rgba(255,255,255,.7), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(201,162,75,.10), transparent 45%),
+      var(--paper);
+    border-radius: 4px;
+    box-shadow: 0 30px 60px rgba(0,0,0,.5);
+    text-align: center;
+    opacity: 0;
+    transform: translateY(26px) scale(.97);
+    transition: opacity .8s ease, transform .8s cubic-bezier(.2,.8,.2,1);
+  }
+  .card.shown { display: block; }
+  .card.visible { opacity: 1; transform: none; }
+  .card::before, .card::after { content: ""; position: absolute; pointer-events: none; }
+  .card::before { inset: 10px; border: 1.5px solid var(--gold); }
+  .card::after  { inset: 15px; border: 1px solid rgba(201,162,75,.45); }
+
+  .stamp {
+    position: absolute;
+    top: -22px; right: 22px;
+    width: 80px; height: 100px;
+    padding: 6px;
+    background: #fffaf0;
+    transform: rotate(6deg);
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,.25));
+    -webkit-mask: radial-gradient(circle 3.6px, #0000 97%, #000) -5px -5px / 10px 10px,
+                  linear-gradient(#000 0 0) content-box;
+            mask: radial-gradient(circle 3.6px, #0000 97%, #000) -5px -5px / 10px 10px,
+                  linear-gradient(#000 0 0) content-box;
+    z-index: 2;
+  }
+  .stamp-inner {
+    height: 100%;
+    background: linear-gradient(160deg, var(--wine-light), var(--wine));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 2px;
+    color: var(--gold-light);
+    font-size: .6rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  .stamp-inner svg { width: 40px; height: 40px; stroke: var(--gold-light); fill: none; stroke-width: 1.6; }
+
+  .postmark {
+    position: absolute;
+    top: 30px; right: 74px;
+    width: 92px; height: 92px;
+    transform: rotate(-14deg);
+    opacity: .5;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .postmark text { font-family: 'Cormorant Garamond', serif; font-size: 11px; letter-spacing: 2px; fill: var(--wine); font-weight: 600; }
+
+  .eyebrow { font-size: .95rem; letter-spacing: .32em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+
+  h1 {
+    font-family: 'Great Vibes', cursive;
+    font-weight: 400;
+    font-size: clamp(2.9rem, 11vw, 4.2rem);
+    line-height: 1.1;
+    color: var(--wine);
+    margin: 6px 0 2px;
+  }
+
+  .divider { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 10px auto 22px; color: var(--gold); }
+  .divider::before, .divider::after { content: ""; height: 1px; width: 70px; background: linear-gradient(90deg, transparent, var(--gold)); }
+  .divider::after { transform: scaleX(-1); }
+  .divider svg { width: 18px; height: 18px; fill: var(--gold); }
+
+  .lead { font-size: 1.3rem; font-style: italic; color: var(--muted); line-height: 1.45; max-width: 420px; margin: 0 auto 28px; }
+
+  .venue {
+    position: relative;
+    border: 1.5px solid var(--gold);
+    border-radius: 4px;
+    padding: 34px clamp(12px, 4vw, 24px) 24px;
+    margin: 18px 0 30px;
+    background: rgba(201,162,75,.05);
+  }
+  .venue-head {
+    position: absolute;
+    left: 50%; top: 0;
+    transform: translate(-50%, -50%);
+    background: var(--paper);
+    padding: 0 16px;
+    width: max-content;
+    max-width: 92%;
+    line-height: 1.1;
+  }
+  .venue-label, .venue-city { display: block; font-size: .78rem; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  .venue-head h3 { font-size: clamp(1.25rem, 5vw, 1.6rem); font-weight: 600; color: var(--wine); margin: 2px 0; }
+
+  .gifts { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: 14px; margin-top: 18px; }
+  .gift { padding: 4px 6px; }
+  .gift-icon {
+    width: 70px; height: 70px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    border: 1.5px solid var(--gold);
+    display: grid;
+    place-items: center;
+    background: rgba(201,162,75,.08);
+  }
+  .gift-icon svg { width: 36px; height: 36px; stroke: var(--wine); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .gift h2 { font-size: 1.45rem; font-weight: 600; color: var(--wine); line-height: 1.15; margin-bottom: 6px; }
+  .gift p { font-size: 1.08rem; line-height: 1.4; color: var(--ink); }
+  .gift strong { font-weight: 600; color: var(--wine); }
+  .plus { font-family: 'Great Vibes', cursive; font-size: 2.4rem; color: var(--gold); align-self: center; padding-top: 0; }
+
+  .when {
+    display: inline-block;
+    padding: 14px 30px 16px;
+    border: 1.5px dashed var(--gold);
+    border-radius: 3px;
+    background: rgba(201,162,75,.07);
+    margin-bottom: 26px;
+  }
+  .when .label { display: block; font-size: .8rem; letter-spacing: .28em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .when strong { font-size: 1.5rem; font-weight: 600; color: var(--wine); }
+  .when strong svg { width: 18px; height: 18px; fill: #a3243f; vertical-align: -2px; margin-left: 4px; }
+
+  .sign { font-family: 'Great Vibes', cursive; font-size: 2rem; color: var(--wine); }
+
+  .again {
+    margin-top: 22px;
+    background: none;
+    border: 0;
+    font-family: inherit;
+    font-size: .95rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 6px 10px;
+  }
+  .again:hover, .again:focus-visible { color: var(--wine); }
+
+  @media (max-width: 520px) {
+    .gifts { grid-template-columns: 1fr; gap: 6px; }
+    .stamp { width: 70px; height: 90px; right: 16px; top: -18px; }
+    .postmark { right: 56px; top: 34px; width: 78px; height: 78px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<!-- Fase 1: sobre cerrado -->
+<section class="intro" id="intro">
+  <button class="envelope" id="envelope" aria-label="Abrir el regalo">
+    <div class="env-back"></div>
+    <div class="env-letter">Para ti</div>
+    <div class="env-left"></div>
+    <div class="env-right"></div>
+    <div class="env-bottom"></div>
+    <div class="env-flap"></div>
+    <div class="seal"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg></div>
+  </button>
+  <p class="hint"><span>¡Tienes correo!</span>Toca el sobre para abrirlo</p>
+</section>
+
+<!-- Fase 2: tarjeta regalo -->
+<article class="card" id="card" aria-live="polite">
+  <div class="stamp" aria-hidden="true">
+    <div class="stamp-inner">
+      <span>Logroño</span>
+      <svg viewBox="0 0 40 40">
+        <path d="M5 15 L20 6 L35 15 Z"/>
+        <path d="M7 15 H33 M7 34 H33 M4 37 H36"/>
+        <path d="M11 18 V31 M17 18 V31 M23 18 V31 M29 18 V31"/>
+      </svg>
+      <span>La Rioja</span>
+    </div>
+  </div>
+  <svg class="postmark" viewBox="0 0 100 100" aria-hidden="true">
+    <defs><path id="ring" d="M50,50 m-36,0 a36,36 0 1,1 72,0 a36,36 0 1,1 -72,0"/></defs>
+    <circle cx="50" cy="50" r="46" fill="none" stroke="#4a0f1f" stroke-width="2"/>
+    <circle cx="50" cy="50" r="27" fill="none" stroke="#4a0f1f" stroke-width="1.2"/>
+    <text><textPath href="#ring">FELICIDADES · CON AMOR · </textPath></text>
+    <text x="50" y="55" text-anchor="middle" style="font-size:14px;letter-spacing:1px">♥</text>
+  </svg>
+
+  <p class="eyebrow">Vale regalo</p>
+  <h1>¡Feliz cumpleaños!</h1>
+  <div class="divider" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z"/></svg></div>
+
+  <p class="lead">Este año tu regalo no se envuelve: se vive. Te regalo una escapada para nosotros dos en el…</p>
+
+  <div class="venue">
+  <div class="venue-head">
+    <span class="venue-label">Hotel</span>
+    <h3>Áurea Palacio de Correos</h3>
+    <span class="venue-city">Logroño</span>
+  </div>
+
+  <div class="gifts">
+    <div class="gift">
+      <div class="gift-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48">
+          <ellipse cx="24" cy="38" rx="15" ry="5"/>
+          <ellipse cx="24" cy="28.5" rx="11" ry="4.5"/>
+          <ellipse cx="24" cy="20" rx="7.5" ry="3.5"/>
+          <path d="M24 16.5c-1.5-5 1.5-9.5 8-10.5 0 5.5-3 9.5-8 10.5z"/>
+        </svg>
+      </div>
+      <h2>Una sesión de masaje</h2>
+      <p>Para desconectar de todo, relajarnos y dejarnos cuidar.</p>
+    </div>
+
+    <div class="plus" aria-hidden="true">&amp;</div>
+
+    <div class="gift">
+      <div class="gift-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48">
+          <path d="M30 9a15 15 0 1 0 10 25.5A12.5 12.5 0 0 1 30 9z"/>
+          <path d="M37 8v5M34.5 10.5h5M41 17v3M39.5 18.5h3"/>
+        </svg>
+      </div>
+      <h2>Una noche de hotel</h2>
+      <p>Para dormir en pleno corazón de Logroño y despertar sin prisas.</p>
+    </div>
+  </div>
+  </div>
+
+  <div class="when">
+    <span class="label">Fecha de uso</span>
+    <strong>Cuando nosotros queramos<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg></strong>
+  </div>
+
+  <p class="sign">Con todo mi cariño</p>
+
+  <button class="again" id="again">↺ Volver a abrir</button>
+</article>
+
+<script>
+  const envelope = document.getElementById('envelope');
+  const intro = document.getElementById('intro');
+  const card = document.getElementById('card');
+  const again = document.getElementById('again');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  envelope.addEventListener('click', () => {
+    if (envelope.classList.contains('open')) return;
+    envelope.classList.add('open');
+    setTimeout(() => {
+      intro.classList.add('hidden');
+      setTimeout(() => {
+        intro.style.display = 'none';
+        card.classList.add('shown');
+        requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('visible')));
+        burst();
+      }, reduceMotion ? 0 : 500);
+    }, reduceMotion ? 0 : 1300);
+  });
+
+  again.addEventListener('click', () => {
+    card.classList.remove('visible', 'shown');
+    envelope.classList.remove('open');
+    intro.style.display = '';
+    requestAnimationFrame(() => intro.classList.remove('hidden'));
+  });
+
+  // Confeti dorado
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  const colors = ['#c9a24b', '#ecd49a', '#f6e7b8', '#a3243f', '#fbf6ea'];
+  let particles = [];
+  let animating = false;
+
+  function resize() {
+    canvas.width = window.innerWidth * devicePixelRatio;
+    canvas.height = window.innerHeight * devicePixelRatio;
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function burst() {
+    if (reduceMotion) return;
+    const w = window.innerWidth, h = window.innerHeight;
+    for (let i = 0; i < 180; i++) {
+      particles.push({
+        x: w / 2 + (Math.random() - .5) * 120,
+        y: h * .38,
+        vx: (Math.random() - .5) * 13,
+        vy: -Math.random() * 13 - 4,
+        size: Math.random() * 7 + 4,
+        rot: Math.random() * Math.PI,
+        vr: (Math.random() - .5) * .3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        life: 1
+      });
+    }
+    if (!animating) { animating = true; requestAnimationFrame(tick); }
+  }
+
+  function tick() {
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    particles.forEach(p => {
+      p.vy += .28;
+      p.vx *= .99;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      p.life -= .006;
+      ctx.save();
+      ctx.globalAlpha = Math.max(p.life, 0);
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+      ctx.restore();
+    });
+    particles = particles.filter(p => p.life > 0 && p.y < window.innerHeight + 40);
+    if (particles.length) requestAnimationFrame(tick);
+    else { animating = false; ctx.clearRect(0, 0, window.innerWidth, window.innerHeight); }
+  }
+</script>
+</body>
+</html>
