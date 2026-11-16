@@ -2,8 +2,12 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#4a0f1f">
 <title>Feliz cumpleaños</title>
+<meta property="og:title" content="¡Tienes correo! 💌">
+<meta property="og:description" content="Toca para abrir tu regalo de cumpleaños">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💌</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
@@ -22,20 +26,36 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html { -webkit-text-size-adjust: 100%; background: var(--wine-deep); }
+
   body {
     min-height: 100vh;
+    min-height: 100svh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 32px 16px;
-    background:
-      radial-gradient(ellipse at 50% 0%, rgba(201,162,75,.18), transparent 55%),
-      radial-gradient(ellipse at 50% 30%, var(--wine-light) 0%, var(--wine) 45%, var(--wine-deep) 100%);
-    background-attachment: fixed;
+    padding:
+      max(32px, env(safe-area-inset-top))
+      max(16px, env(safe-area-inset-right))
+      max(32px, env(safe-area-inset-bottom))
+      max(16px, env(safe-area-inset-left));
     font-family: 'Cormorant Garamond', Georgia, serif;
     color: var(--ink);
     overflow-x: hidden;
   }
+
+  /* Fondo fijo en un pseudo-elemento: background-attachment: fixed no funciona bien en iOS */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(201,162,75,.18), transparent 55%),
+      radial-gradient(ellipse at 50% 30%, var(--wine-light) 0%, var(--wine) 45%, var(--wine-deep) 100%);
+  }
+
+  button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
   #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
 
@@ -281,9 +301,52 @@
   .again:hover, .again:focus-visible { color: var(--wine); }
 
   @media (max-width: 520px) {
-    .gifts { grid-template-columns: 1fr; gap: 6px; }
-    .stamp { width: 70px; height: 90px; right: 16px; top: -18px; }
-    .postmark { right: 56px; top: 34px; width: 78px; height: 78px; }
+    body {
+      padding-left: max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
+    }
+
+    .intro { margin-top: 60px; gap: 28px; }
+    .hint { font-size: .85rem; letter-spacing: .18em; }
+    .hint span { font-size: 2.4rem; }
+
+    /* Sello y matasellos arriba, sin pisar el título */
+    .card { padding: 86px 22px 26px; }
+    .card::before { inset: 8px; }
+    .card::after  { inset: 12px; }
+    .stamp { width: 70px; height: 90px; right: 18px; top: -16px; }
+    .postmark { width: 66px; height: 66px; top: 10px; right: 80px; }
+
+    h1 { font-size: clamp(2.3rem, 12vw, 2.9rem); }
+    .divider { margin: 6px auto 16px; }
+    .divider::before, .divider::after { width: 50px; }
+    .lead { font-size: 1.15rem; margin-bottom: 22px; }
+
+    .venue { padding: 44px 14px 16px; margin: 26px 0 24px; }
+    .venue-head { padding: 0 10px; }
+    .venue-label, .venue-city { font-size: .7rem; letter-spacing: .24em; }
+    .venue-head h3 { font-size: 1.15rem; }
+
+    /* Regalos en filas: icono a la izquierda, texto a la derecha */
+    .gifts { grid-template-columns: 1fr; gap: 2px; margin-top: 0; }
+    .gift {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      column-gap: 14px;
+      align-items: center;
+      text-align: left;
+      padding: 6px 0;
+    }
+    .gift-icon { grid-row: span 2; width: 56px; height: 56px; margin: 0; }
+    .gift-icon svg { width: 30px; height: 30px; }
+    .gift h2 { font-size: 1.25rem; margin-bottom: 2px; align-self: end; }
+    .gift p { font-size: 1rem; align-self: start; }
+    .plus { font-size: 1.9rem; line-height: 1; }
+
+    .when { display: block; padding: 12px 14px 14px; margin-bottom: 20px; }
+    .when strong { font-size: 1.3rem; }
+    .sign { font-size: 1.8rem; }
+    .again { margin-top: 12px; padding: 10px 14px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -397,6 +460,7 @@
       setTimeout(() => {
         intro.style.display = 'none';
         card.classList.add('shown');
+        window.scrollTo(0, 0);
         requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('visible')));
         burst();
       }, reduceMotion ? 0 : 500);
@@ -407,6 +471,7 @@
     card.classList.remove('visible', 'shown');
     envelope.classList.remove('open');
     intro.style.display = '';
+    window.scrollTo(0, 0);
     requestAnimationFrame(() => intro.classList.remove('hidden'));
   });
 
@@ -418,9 +483,11 @@
   let animating = false;
 
   function resize() {
-    canvas.width = window.innerWidth * devicePixelRatio;
-    canvas.height = window.innerHeight * devicePixelRatio;
-    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    // Limitar la densidad evita un canvas enorme en móviles con pantallas 3x
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   window.addEventListener('resize', resize);
   resize();
@@ -428,11 +495,13 @@
   function burst() {
     if (reduceMotion) return;
     const w = window.innerWidth, h = window.innerHeight;
-    for (let i = 0; i < 180; i++) {
+    const count = w < 520 ? 120 : 180;
+    const spread = w < 520 ? 9 : 13;
+    for (let i = 0; i < count; i++) {
       particles.push({
         x: w / 2 + (Math.random() - .5) * 120,
         y: h * .38,
-        vx: (Math.random() - .5) * 13,
+        vx: (Math.random() - .5) * spread,
         vy: -Math.random() * 13 - 4,
         size: Math.random() * 7 + 4,
         rot: Math.random() * Math.PI,
